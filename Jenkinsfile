@@ -18,7 +18,7 @@ pipeline {
         stage('Build BAR') {
             steps {
                 sh '''
-                source /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
+                . /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
 
                 mkdir -p $BUILD_DIR
 
@@ -34,7 +34,7 @@ pipeline {
         stage('Deploy BAR') {
             steps {
                 sh '''
-                source /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
+                . /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
 
                 BAR_FILE=$(ls build/*.bar)
 
@@ -44,4 +44,3 @@ pipeline {
         }
     }
 }
-
