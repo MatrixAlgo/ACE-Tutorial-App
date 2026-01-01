@@ -18,15 +18,20 @@ pipeline {
         stage('Build BAR') {
             steps {
                 sh '''
-                . /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
+                bash -lc '
+                set -e
+                set -x
 
-                mkdir -p $BUILD_DIR
+                source /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
+
+                mkdir -p build
 
                 BAR_NAME=$(basename $(pwd)).bar
 
                 ibmint package \
                   --input-path $(pwd) \
-                  --output-bar-file $BUILD_DIR/$BAR_NAME
+                  --output-bar-file build/$BAR_NAME
+                '
                 '''
             }
         }
@@ -34,11 +39,16 @@ pipeline {
         stage('Deploy BAR') {
             steps {
                 sh '''
-                . /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
+                bash -lc '
+                set -e
+                set -x
+
+                source /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
 
                 BAR_FILE=$(ls build/*.bar)
 
-                mqsideploy $ACE_NODE -e $ACE_SERVER -a $BAR_FILE
+                mqsideploy ACE_NODE -e IS01 -a $BAR_FILE -w 120
+                '
                 '''
             }
         }
