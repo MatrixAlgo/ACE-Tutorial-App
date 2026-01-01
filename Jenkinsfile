@@ -1,16 +1,6 @@
 pipeline {
     agent any
 
-    // Trigger the pipeline automatically when a push happens to main
-    triggers {
-        GenericTrigger(
-            genericVariables: [[key: 'ref', value: '$.ref']],
-            token: 'ace-pipeline-123',   // <-- your secret token
-            regexpFilterText: '$ref',
-            regexpFilterExpression: 'refs/heads/main' // trigger only for main branch
-        )
-    }
-
     environment {
         ACE_NODE   = "ACE_NODE"
         ACE_SERVER = "IS01"
@@ -36,7 +26,7 @@ pipeline {
 
                 mkdir -p build
 
-                # Unique BAR name per build
+                # Name BAR uniquely per build to avoid conflicts
                 BAR_NAME=$(basename $(pwd))_${BUILD_NUMBER}.bar
 
                 ibmint package \
@@ -56,19 +46,15 @@ pipeline {
 
                 source /opt/IBM/ace-12.0.12.19/server/bin/mqsiprofile
 
-                BAR_FILE=$(ls build/*.bar)
+                # Pick the latest BAR file created
+                BAR_FILE=$(ls -t build/*.bar | head -1)
 
-                mqsideploy ACE_NODE -e IS01 -a $BAR_FILE -w 120
+                echo "Deploying $BAR_FILE to $ACE_NODE:$ACE_SERVER"
+
+                mqsideploy $ACE_NODE -e $ACE_SERVER -a $BAR_FILE -w 120
                 '
                 '''
             }
-        }
-    }
-
-    post {
-        always {
-            echo "Cleaning workspace"
-            cleanWs()
         }
     }
 }
