@@ -1,6 +1,16 @@
 pipeline {
     agent any
 
+    // Trigger the pipeline automatically when a push happens to main
+    triggers {
+        GenericTrigger(
+            genericVariables: [[key: 'ref', value: '$.ref']],
+            token: 'ace-pipeline-123',   // <-- your secret token
+            regexpFilterText: '$ref',
+            regexpFilterExpression: 'refs/heads/main' // trigger only for main branch
+        )
+    }
+
     environment {
         ACE_NODE   = "ACE_NODE"
         ACE_SERVER = "IS01"
@@ -26,7 +36,8 @@ pipeline {
 
                 mkdir -p build
 
-                BAR_NAME=$(basename $(pwd)).bar
+                # Unique BAR name per build
+                BAR_NAME=$(basename $(pwd))_${BUILD_NUMBER}.bar
 
                 ibmint package \
                   --input-path $(pwd) \
@@ -51,6 +62,13 @@ pipeline {
                 '
                 '''
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Cleaning workspace"
+            cleanWs()
         }
     }
 }
