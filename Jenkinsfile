@@ -1,3 +1,15 @@
+// Add Generic Webhook Trigger
+properties([
+    pipelineTriggers([
+        [$class: 'GenericTrigger',
+         genericVariables: [[key: 'ref', value: '$.ref']],
+         token: 'ace-pipeline-123',                 // must match webhook URL token
+         regexpFilterText: '$ref',
+         regexpFilterExpression: 'refs/heads/main'  // trigger only on main branch
+        ]
+    ])
+])
+
 pipeline {
     agent any
 
