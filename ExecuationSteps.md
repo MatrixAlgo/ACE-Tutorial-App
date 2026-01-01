@@ -14,6 +14,30 @@ Automatically build and deploy IBM App Connect Enterprise (ACE) applications whe
 
 ```
 Developer → GitHub → Webhook → ngrok → Jenkins → BAR Build → ACE Deploy
+
+Developer
+    |
+    v
+GitHub Repository
+    |
+    v
+Webhook
+    |
+    v
+ngrok (exposes Jenkins)
+    |
+    v
+Jenkins Pipeline
+    |
+    v
+Build BAR File
+    |
+    v
+Deploy to ACE Node (IS01)
+    |
+    v
+Application Live
+
 ```
 
 ---
